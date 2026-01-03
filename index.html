@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project EnCode | Themed Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@400;700&display=swap');
+      
+      :root {
+        /* Default Terminal Theme Variables */
+        --primary: #00ff41;
+        --bg-color: #0a0a0a;
+        --dim: #003b00;
+        --shadow-color: rgba(0, 255, 65, 0.5);
+        --radius: 0px;
+        --card-bg: #0a0a0a;
+        --card-inner-bg: #0a0a0a;
+        --header-bg: #003b00;
+        --header-text: #00ff41;
+        --hover-bg: #001a00;
+        --text-color: #00ff41;
+        --btn-primary-bg: #000000;
+        --btn-primary-text: #00ff41;
+        --btn-secondary-bg: #003b00;
+        --btn-secondary-text: #00ff41;
+      }
+
+      /* Red Team Mode Overrides (Only for Terminal theme) */
+      .red-team-active[data-theme="terminal"],
+      .red-team-active:not([data-theme]) {
+        --primary: #ff4141;
+        --dim: #3b0000;
+        --shadow-color: rgba(255, 65, 65, 0.5);
+        --header-bg: #3b0000;
+        --header-text: #ff4141;
+        --hover-bg: #1a0000;
+        --text-color: #ff4141;
+        --btn-primary-text: #ff4141;
+        --btn-secondary-bg: #3b0000;
+        --btn-secondary-text: #ff4141;
+      }
+
+      /* Frutiger Aero Theme */
+      [data-theme="frutiger"] {
+        --primary: #0088ff;
+        --bg-color: #e0f4ff;
+        --dim: #a0d8ff;
+        --shadow-color: rgba(0, 136, 255, 0.3);
+        --radius: 16px;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --card-inner-bg: rgba(255, 255, 255, 0.3);
+        --header-bg: linear-gradient(to bottom, #74c7ff, #0088ff);
+        --header-text: #ffffff;
+        --hover-bg: rgba(255, 255, 255, 0.9);
+        --text-color: #1a3a5a;
+        --btn-primary-bg: linear-gradient(to bottom, #74c7ff, #0088ff);
+        --btn-primary-text: #ffffff;
+        --btn-secondary-bg: #ffffff;
+        --btn-secondary-text: #0088ff;
+        font-family: 'Outfit', sans-serif !important;
+      }
+
+      /* IDE Theme (Monokai-ish) */
+      [data-theme="ide"] {
+        --primary: #a6e22e;
+        --bg-color: #272822;
+        --dim: #49483e;
+        --shadow-color: rgba(166, 226, 46, 0.2);
+        --radius: 4px;
+        --card-bg: #1e1f1c;
+        --card-inner-bg: #272822;
+        --header-bg: #3e3d32;
+        --header-text: #f8f8f2;
+        --hover-bg: #3e3d32;
+        --text-color: #f8f8f2;
+        --btn-primary-bg: #a6e22e;
+        --btn-primary-text: #272822;
+        --btn-secondary-bg: #66d9ef;
+        --btn-secondary-text: #272822;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        overflow: hidden;
+        transition: background-color 0.5s ease;
+      }
+
+      .theme-frutiger body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4) 0%, transparent 100%),
+                    linear-gradient(135deg, #e0f4ff 0%, #b3e0ff 100%);
+        z-index: -1;
+      }
+
+      .theme-frutiger .NeoCard {
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+      }
+
+      .theme-frutiger .NeoButton {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 2px 2px rgba(255,255,255,0.5);
+        border: 1px solid rgba(255,255,255,0.3);
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* CRT Scanline Effect (Only for Terminal) */
+      [data-theme="terminal"]::before,
+      body:not([data-theme])::before {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 100;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+      }
+
+      .bg-checkered {
+        background-image: radial-gradient(circle, var(--dim) 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-color);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--dim);
+        border: 1px solid var(--primary);
+      }
+      
+      @keyframes flicker {
+        0% { opacity: 0.99; }
+        100% { opacity: 1; }
+      }
+
+      .terminal-screen {
+        animation: flicker 0.1s infinite;
+      }
+
+      /* Smooth Transitions */
+      * {
+        transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "prismjs": "https://esm.sh/prismjs@1.29.0",
+    "react-simple-code-editor": "https://esm.sh/react-simple-code-editor@0.13.1"
+  }
+}
+</script>
+</head>
+  <body class="terminal-screen">
+    <div id="root"></div>
+  </body>
+</html>
