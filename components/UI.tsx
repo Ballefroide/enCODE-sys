@@ -29,12 +29,13 @@ export const NeoButton: React.FC<ButtonProps> = ({
         ${baseColors[variant]} 
         border-2 
         ${SHADOW_STYLE} 
-        px-6 py-2 
-        font-mono font-bold text-lg
+        px-4 py-3 sm:px-6 sm:py-2 
+        font-mono font-bold text-sm sm:text-lg
         uppercase tracking-widest
         disabled:opacity-30
         active:translate-y-1
         rounded-[var(--radius)]
+        flex items-center justify-center
         ${className}
       `}
       {...props}
@@ -48,11 +49,11 @@ export const NeoCard: React.FC<{ children: React.ReactNode; className?: string; 
   return (
     <div className={`${CARD_BASE} ${className} flex flex-col overflow-hidden`}>
       {title && (
-        <div className="border-b-2 border-[var(--primary)] bg-[var(--header-bg)] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[var(--header-text)]">
+        <div className="border-b-2 border-[var(--primary)] bg-[var(--header-bg)] px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[var(--header-text)] truncate">
           :: {title} ::
         </div>
       )}
-      <div className="flex-1 overflow-auto bg-[var(--card-inner-bg)]">
+      <div className="flex-1 overflow-auto bg-[var(--card-inner-bg)] relative">
         {children}
       </div>
     </div>
