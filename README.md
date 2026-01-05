@@ -2,7 +2,7 @@
 This is highly experimental. Feedback is highly appreciated.
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:**  Node.js (https://nodejs.org/en/download)
 
 
 1. Install dependencies:
