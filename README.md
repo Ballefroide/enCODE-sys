@@ -1,4 +1,5 @@
 ## Project EnCode
+This is highly experimental. Feedback is highly appreciated.
 ## Run Locally
 
 **Prerequisites:**  Node.js
