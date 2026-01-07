@@ -13,6 +13,16 @@ const App: React.FC = () => {
     return (localStorage.getItem('encode_theme') as Theme) || Theme.TERMINAL;
   });
 
+  // Accessibility State: Plain Language Mode
+  const [isSimpleMode, setIsSimpleMode] = useState(() => {
+    return localStorage.getItem('encode_simple_mode') === 'true';
+  });
+
+  // Accessibility State: Reduced Visual Effects
+  const [removeEffects, setRemoveEffects] = useState(() => {
+    return localStorage.getItem('encode_remove_effects') === 'true';
+  });
+
   // Anti-cheat / Red Team Mode State
   const [isRedTeamMode, setIsRedTeamMode] = useState(() => {
     return localStorage.getItem('encode_red_team') === 'true';
@@ -25,36 +35,33 @@ const App: React.FC = () => {
   // Centralized Profiles State
   const [profiles, setProfiles] = useState<Profile[]>(() => {
     const saved = localStorage.getItem('encode_profiles');
-    let loaded = saved ? JSON.parse(saved) : [];
-    
-    // Ensure the Architect exists by default for demoing unlocks
-    const ARCHITECT_ID = 'sys_architect_001';
-    if (!loaded.find((p: Profile) => p.id === ARCHITECT_ID)) {
-      const architect: Profile = {
-        id: ARCHITECT_ID,
-        name: 'SYS_ARCHITECT',
-        levelsCompleted: 4, // Unlocks IDE by default
-        errorsMade: 0,
-        accuracyRate: 100,
-        fastestClear: '1:23:45',
-        retentionBest: 0,
-        created: Date.now()
-      };
-      loaded = [architect, ...loaded];
-    }
-    return loaded;
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // Sync profiles to localStorage whenever they change
+  // Sync profiles to localStorage
   useEffect(() => {
     localStorage.setItem('encode_profiles', JSON.stringify(profiles));
   }, [profiles]);
 
-  // Sync theme to localStorage and DOM
+  // Sync theme
   useEffect(() => {
     localStorage.setItem('encode_theme', theme);
     document.documentElement.setAttribute('data-theme', theme.toLowerCase());
   }, [theme]);
+
+  // Sync Accessibility modes
+  useEffect(() => {
+    localStorage.setItem('encode_simple_mode', isSimpleMode.toString());
+  }, [isSimpleMode]);
+
+  useEffect(() => {
+    localStorage.setItem('encode_remove_effects', removeEffects.toString());
+    if (removeEffects) {
+      document.body.classList.add('effects-disabled');
+    } else {
+      document.body.classList.remove('effects-disabled');
+    }
+  }, [removeEffects]);
 
   // Sync Red Team mode
   useEffect(() => {
@@ -67,7 +74,6 @@ const App: React.FC = () => {
     }
   }, [isRedTeamMode, redTeamRevealed]);
 
-  // Derived: Global progression for theme unlocks
   const maxLevelsCleared = useMemo(() => {
     if (profiles.length === 0) return 0;
     return Math.max(...profiles.map(p => p.levelsCompleted), 0);
@@ -82,6 +88,10 @@ const App: React.FC = () => {
   const handleProfileSelect = (p: Profile) => {
     setCurrentProfileId(p.id);
     setScreen(ScreenState.LEVEL_SELECT);
+  };
+
+  const handleMarkTutorialSeen = (profileId: string) => {
+    setProfiles(prev => prev.map(p => p.id === profileId ? { ...p, hasSeenTutorialPrompt: true } : p));
   };
 
   const handleLevelSelect = (l: Level) => {
@@ -105,9 +115,11 @@ const App: React.FC = () => {
                 retentionBest: Math.max(p.retentionBest, session.score || 0)
               };
             }
+            // Track level ID as a number for unlock logic
+            const currentIdNum = parseInt(currentLevel?.id.replace('-', '.') || "0");
             return {
               ...p,
-              levelsCompleted: Math.max(p.levelsCompleted, currentLevel ? parseInt(currentLevel.id) : p.levelsCompleted),
+              levelsCompleted: Math.max(p.levelsCompleted, currentIdNum),
               accuracyRate: Math.max(p.accuracyRate, session.accuracy)
             };
          }
@@ -126,7 +138,7 @@ const App: React.FC = () => {
   };
 
   const handleHeaderClick = () => {
-    if (currentProfileId) {
+    if (!currentProfileId) {
       const nextCount = headerTapCount + 1;
       setHeaderTapCount(nextCount);
       if (nextCount >= 5 && !redTeamRevealed) {
@@ -138,12 +150,14 @@ const App: React.FC = () => {
 
   return (
     <div className={`w-full h-screen bg-[var(--bg-color)] text-[var(--primary)] font-mono selection:bg-[var(--dim)] selection:text-[var(--primary)] overflow-hidden flex flex-col theme-${theme.toLowerCase()} ${isRedTeamMode ? 'red-team-active' : ''}`}>
-      <div 
-        onClick={handleHeaderClick}
-        className={`absolute top-2 left-4 text-[10px] opacity-20 z-50 font-bold uppercase tracking-widest text-[var(--primary)] cursor-pointer select-none`}
-      >
-         PROJECT_ENCODE_V2.5 // {theme}_ENGINE_RUNNING {isRedTeamMode ? '[RED_TEAM_ACTIVE]' : ''}
-      </div>
+      {!currentProfileId && (
+        <div 
+          onClick={handleHeaderClick}
+          className={`hidden sm:block absolute top-2 right-4 text-[10px] opacity-20 z-50 font-bold uppercase tracking-widest text-[var(--primary)] cursor-pointer select-none`}
+        >
+           PROJECT_ENCODE_V2.5 // {theme}_ENGINE_RUNNING {isRedTeamMode ? '[RED_TEAM_ACTIVE]' : ''}
+        </div>
+      )}
 
       <main className="flex-1 w-full h-full relative">
         {screen === ScreenState.MENU && (
@@ -163,6 +177,10 @@ const App: React.FC = () => {
              redTeamRevealed={redTeamRevealed}
              isRedTeamMode={isRedTeamMode}
              onRedTeamToggle={() => setIsRedTeamMode(!isRedTeamMode)}
+             isSimpleMode={isSimpleMode}
+             onSimpleModeToggle={() => setIsSimpleMode(!isSimpleMode)}
+             removeEffects={removeEffects}
+             onRemoveEffectsToggle={() => setRemoveEffects(!removeEffects)}
           />
         )}
 
@@ -178,14 +196,19 @@ const App: React.FC = () => {
         {screen === ScreenState.LEVEL_SELECT && currentProfile && (
           <LevelSelect 
             profile={currentProfile} 
+            isSimpleMode={isSimpleMode}
             onLevelSelect={handleLevelSelect} 
             onRetentionStart={handleStartRetention}
-            onBack={() => setScreen(ScreenState.PROFILES)}
+            onMarkTutorialSeen={handleMarkTutorialSeen}
+            onBack={() => {
+              setCurrentProfileId(null);
+              setScreen(ScreenState.PROFILES);
+            }}
           />
         )}
 
         {screen === ScreenState.BRIEFING && currentLevel && (
-           <LevelBriefing level={currentLevel} onStart={handleStartLevel} onBack={() => setScreen(ScreenState.LEVEL_SELECT)} />
+           <LevelBriefing level={currentLevel} onStart={handleStartLevel} onBack={() => setScreen(ScreenState.LEVEL_SELECT)} isSimpleMode={isSimpleMode} />
         )}
 
         {screen === ScreenState.GAMEPLAY && currentLevel && (
@@ -194,6 +217,7 @@ const App: React.FC = () => {
              onFinish={handleGameFinish} 
              onExit={() => setScreen(ScreenState.LEVEL_SELECT)}
              isAntiCheatEnabled={!isRedTeamMode}
+             isSimpleMode={isSimpleMode}
            />
         )}
 
@@ -202,11 +226,12 @@ const App: React.FC = () => {
              onFinish={handleGameFinish}
              onExit={() => setScreen(ScreenState.LEVEL_SELECT)}
              isAntiCheatEnabled={!isRedTeamMode}
+             isSimpleMode={isSimpleMode}
            />
         )}
 
         {screen === ScreenState.RESULT && lastSession && (
-           <ResultScreen session={lastSession} onNext={handleNextLevel} onRetry={handleRetry} />
+           <ResultScreen session={lastSession} onNext={handleNextLevel} onRetry={handleRetry} isSimpleMode={isSimpleMode} />
         )}
       </main>
     </div>

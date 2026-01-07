@@ -127,6 +127,14 @@
         pointer-events: none;
       }
 
+      /* Disable effects for accessibility */
+      .effects-disabled::before {
+        display: none !important;
+      }
+      .effects-disabled {
+        animation: none !important;
+      }
+
       .bg-checkered {
         background-image: radial-gradient(circle, var(--dim) 1px, transparent 1px);
         background-size: 20px 20px;

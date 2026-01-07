@@ -34,6 +34,7 @@ export interface Profile {
   fastestClear: string; // "MM:SS"
   retentionBest: number; // Max nodes cleared in one retention session
   created: number;
+  hasSeenTutorialPrompt?: boolean;
 }
 
 export interface Level {
@@ -43,7 +44,9 @@ export interface Level {
   title: string;
   language: Language;
   description: string;
+  simpleDescription: string;
   objective: string;
+  simpleObjective: string;
   targetOutput: string; // Description or HTML string
   difficulty: 'Easy' | 'Medium' | 'Hard';
 }
