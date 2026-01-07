@@ -1,14 +1,17 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+## Project EnCode
+# what is this even about?
+"A sci-fi(?) programming puzzle game where you satisfy client requests using HTML, CSS, and logic. Features AI-powered code evaluation"
+This is made solely to be evaluated.
+Also, don't hate on me for using AI for this. This is not and will never be my passion project.
+# screenshots?
+how do i upload images
+oh nvm
+<img width="1920" height="895" alt="image" src="https://github.com/user-attachments/assets/375a1ae0-b3e2-4b59-9baf-e5975e54332e" />
+<img width="1920" height="899" alt="image" src="https://github.com/user-attachments/assets/4637be3a-42b5-4a21-95a6-0335a258bd13" />
+<img width="1920" height="910" alt="image" src="https://github.com/user-attachments/assets/7da418ae-9bef-4f60-93fa-45a9465e08c7" />
+<img width="1920" height="903" alt="image" src="https://github.com/user-attachments/assets/d804521a-9115-4b3f-9d7a-5c9e541b8c25" />
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1eNLvrOCl9M3uk7ul5RtunvIRCcFQEqMN
-
-## Run Locally
+## Cool, how do I run this slop?
 
 **Prerequisites:**  Node.js
 
